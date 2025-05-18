@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StridesSMP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: url('https://www.transparenttextures.com/patterns/lava.png');
+      background-color: #2c0000;
+      background-size: contain;
+    }
+  </style>
+</head>
+<body class="text-white min-h-screen">
+  <header class="text-center py-10 bg-red-800/80 shadow-lg">
+    <h1 class="text-4xl font-extrabold">🔥 StridesSMP 🔥</h1>
+    <p class="text-lg mt-2">Minecraft SMP Members & Recent Videos</p>
+  </header>
+
+  <main class="p-6">
+    <div id="members" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+  </main>
+
+  <script>
+    const API_KEY = "AIzaSyDuhJqvgo0O-L4t58aSEoEY9R4cMPmQdjY";
+    const handles = [
+      "KipporMC", "LilsADragon", "zskv", "6ProUp4", "CorruptEndermen",
+      "ExplodinEmeralds", "LunarArchitect", "Missing_Design", "Plinkooo",
+      "OnyxFL", "RandomHiklo", "Salesman.S", "IZombbyVODS", "YlabsOrin",
+      "RunelessOfficial", "PeachyBanjo", "ItsNotLeon", "LennCrafter",
+      "freneticnoodle9747", "Tobypiggy123", "unhappybean"
+    ];
+
+    async function getChannelData(handle) {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=snippet,contentDetails&forHandle=${handle}&key=${API_KEY}`);
+      const data = await res.json();
+      return data.items?.[0];
+    }
+
+    async function getLatestVideo(uploadPlaylistId) {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=1&playlistId=${uploadPlaylistId}&key=${API_KEY}`);
+      const data = await res.json();
+      return data.items?.[0];
+    }
+
+    async function displayMembers() {
+      const container = document.getElementById("members");
+      for (const handle of handles) {
+        try {
+          const channel = await getChannelData(handle);
+          if (!channel) continue;
+
+          const title = channel.snippet.title;
+          const thumbnail = channel.snippet.thumbnails.medium.url;
+          const uploads = channel.contentDetails.relatedPlaylists.uploads;
+          const video = await getLatestVideo(uploads);
+          const videoId = video.snippet.resourceId.videoId;
+
+          const card = document.createElement("div");
+          card.className = "bg-red-900/70 rounded-2xl shadow-lg overflow-hidden";
+          card.innerHTML = `
+            <div class="p-4">
+              <div class="flex items-center gap-4 mb-3">
+                <img src="${thumbnail}" alt="${title}" class="w-12 h-12 rounded-full" />
+                <a href="https://youtube.com/@${handle}" target="_blank" class="font-bold text-lg hover:underline">${title}</a>
+              </div>
+              <iframe class="w-full aspect-video rounded-lg" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
+            </div>
+          `;
+          container.appendChild(card);
+        } catch (e) {
+          console.error(`Failed for ${handle}:`, e);
+        }
+      }
+    }
+
+    displayMembers();
+  </script>
+</body>
+</html>
