@@ -57,7 +57,7 @@
           const thumbnail = channel.snippet.thumbnails.medium.url;
           const uploads = channel.contentDetails.relatedPlaylists.uploads;
           const video = await getLatestVideo(uploads);
-          const videoId = video.snippet.resourceId.videoId;
+          const videoId = video?.snippet?.resourceId?.videoId;
 
           const card = document.createElement("div");
           card.className = "bg-red-900/70 rounded-2xl shadow-lg overflow-hidden";
@@ -66,6 +66,7 @@
               <div class="flex items-center gap-4 mb-3">
                 <img src="${thumbnail}" alt="${title}" class="w-12 h-12 rounded-full" />
                 <a href="https://youtube.com/@${handle}" target="_blank" class="font-bold text-lg hover:underline">${title}</a>
+                
               </div>
               <iframe class="w-full aspect-video rounded-lg" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
             </div>
@@ -107,5 +108,60 @@
 
 <!-- Add Twitter widget script -->
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<!-- Rotating Social Banner -->
+<div id="social-banner" class="fixed bottom-0 left-0 w-full bg-red-900/90 text-white text-center py-3 px-4 shadow-t transition-opacity duration-500 z-50">
+  <div id="social-content" class="flex items-center justify-center gap-3 text-lg font-semibold transition-opacity duration-500 opacity-100">
+    <!-- Injected by JS -->
+  </div>
+</div>
+
+<script>
+  const socials = [
+    {
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 fill-red-500" viewBox="0 0 24 24"><path d="M23.498 6.186a2.994 2.994 0 0 0-2.108-2.115C19.702 3.5 12 3.5 12 3.5s-7.702 0-9.39.571A2.994 2.994 0 0 0 .502 6.186C0 7.873 0 12 0 12s0 4.127.502 5.814a2.994 2.994 0 0 0 2.108 2.115C4.298 20.5 12 20.5 12 20.5s7.702 0 9.39-.571a2.994 2.994 0 0 0 2.108-2.115C24 16.127 24 12 24 12s0-4.127-.502-5.814zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"/></svg>`,
+      text: "Subscribe to our YouTube!",
+      link: "https://www.youtube.com/@StridesSMP"
+    },
+    {
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M21.01 12c0-4.973-4.037-9.01-9.01-9.01S2.99 7.027 2.99 12c0 4.973 4.037 9.01 9.01 9.01s9.01-4.037 9.01-9.01zM12 7l2.25 6H9.75L12 7z"/></svg>`,
+      text: "Follow us on BlueSky",
+      link: "https://bsky.app/profile/stridessmp.com"
+    },
+    {
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-indigo-400" viewBox="0 0 245 240"><path fill="currentColor" d="M104.4 23.6c-2.7 0-5.4 0-8.1.1C67.2 24.9 44.3 35 29.2 52.1 17.2 66 10.7 82.6 10.3 101.8c-.5 21.3 6.7 38.7 19.6 52.4 7.1 7.6 15.8 13.6 25.5 17.8 2 5.5 3.4 11.1 4.4 16.8l.5 3.1c.2 1.1.3 2.2.5 3.3l.2 1.2.2 1.1c.2.8.4 1.6.6 2.4.1.4.3.8.5 1.2.3.6.7 1.1 1.2 1.6.4.4.9.7 1.4.9.6.3 1.3.4 2 .4.7 0 1.4-.2 2-.4 1.2-.5 2.3-1.2 3.3-2.1 6.6-6.1 12.5-13 18.2-20.2 6.3.9 12.6 1.4 18.8 1.4h.2c7.2 0 14.3-.6 21.3-1.9 5.7 7.2 11.9 14.2 18.4 20.3.9.9 2 1.6 3.2 2.1.7.2 1.4.4 2.1.4.7 0 1.4-.1 2-.4.6-.2 1.1-.5 1.5-.9.5-.5.9-1 1.2-1.6.2-.4.4-.8.5-1.2.3-.8.5-1.6.6-2.4l.2-1.1.2-1.2c.2-1.1.3-2.2.5-3.3l.5-3.1c1-5.7 2.5-11.3 4.5-16.8 9.6-4.2 18.1-10.2 25.1-17.7 13.1-14 20.2-31.3 19.7-52.7-.4-19.2-7-35.8-19.2-49.7-15.2-17.1-38.4-27.1-67.1-28.4-2.9-.1-5.8-.2-8.8-.2H104.4z"/></svg>`,
+      text: "Join the lava pool!",
+      link: "https://discord.gg/V5sUJR2B5c"
+    },
+    {
+      icon: `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-400" viewBox="0 0 24 24" fill="currentColor"><path d="M22.46 6c-.77.35-1.6.58-2.46.69a4.3 4.3 0 0 0 1.88-2.38 8.5 8.5 0 0 1-2.7 1.03 4.26 4.26 0 0 0-7.3 3.89 12.09 12.09 0 0 1-8.78-4.45 4.27 4.27 0 0 0 1.32 5.68 4.24 4.24 0 0 1-1.93-.53v.05a4.28 4.28 0 0 0 3.42 4.18 4.28 4.28 0 0 1-1.92.07 4.28 4.28 0 0 0 4 2.98A8.57 8.57 0 0 1 2 18.57a12.1 12.1 0 0 0 6.56 1.92c7.88 0 12.2-6.53 12.2-12.2l-.01-.56A8.6 8.6 0 0 0 24 4.56a8.47 8.47 0 0 1-2.44.67 4.25 4.25 0 0 0 1.87-2.33z"/></svg>`,
+      text: "Follow us on Twitter!",
+      link: "https://twitter.com/stridessmpmc"
+    }
+  ];
+
+  let current = 0;
+  const content = document.getElementById("social-content");
+
+  function updateBanner() {
+    const { icon, text, link } = socials[current];
+
+    content.classList.remove("opacity-100");
+    content.classList.add("opacity-0");
+
+    setTimeout(() => {
+      content.innerHTML = `
+        ${icon}
+        <a href="${link}" target="_blank" class="hover:underline">${text}</a>
+      `;
+      content.classList.remove("opacity-0");
+      content.classList.add("opacity-100");
+    }, 300);
+
+    current = (current + 1) % socials.length;
+  }
+
+  updateBanner();
+  setInterval(updateBanner, 4000);
+</script>
 </body>
 </html>
